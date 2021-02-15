@@ -2,6 +2,7 @@ using CovidDataExtractor.Entity;
 using CovidDataExtractor.Repositories;
 using CovidDataExtractor.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Http;
@@ -24,13 +25,19 @@ namespace CovidDataExtractor
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddHostedService<Worker>();
+                    var DevSettings = new ConfigurationBuilder()
+                                                     .SetBasePath(hostContext.HostingEnvironment.ContentRootPath)
+                                                     .AddJsonFile("appsettings.Development.json")
+                                                     .Build();
                     services.AddDbContextFactory<CovidContext>((x) =>
                     {
                         if (hostContext.HostingEnvironment.IsDevelopment())
-                            x.UseSqlServer(hostContext.Configuration.GetSection("ConnectionStrings")["Development"]);
+                            x.UseSqlServer(DevSettings.GetSection("ConnectionStrings")["Database"]);
                         else
-                            x.UseSqlServer(hostContext.Configuration.GetSection("ConnectionStrings")["Production"]);
+                            x.UseSqlServer(hostContext.Configuration.GetSection("ConnectionStrings")["Database"]);
                     });
+
+
                     services.AddHttpClient();
                     services.AddTransient<IRepository, Repository>();
                     services.AddSingleton<IWebScrapingService, WebScrapingService>();
