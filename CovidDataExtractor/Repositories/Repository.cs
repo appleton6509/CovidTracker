@@ -16,11 +16,15 @@ namespace CovidDataExtractor.Repositories
             this.factory = factory;
         }
 
-        public Task Add(Data data)
+        public async Task Add(Data data)
         {
             using var context = factory.CreateDbContext();
+            if (Exists(data.FromDate))
+                return;
+
             context.Data.Add(data);
-            return context.SaveChangesAsync();
+            await context.SaveChangesAsync();
+            return;
         }
         public bool Exists(DateTime fromdate)
         {

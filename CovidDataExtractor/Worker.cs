@@ -1,4 +1,5 @@
 using CovidDataExtractor.DTO;
+using CovidDataExtractor.Entity;
 using CovidDataExtractor.Repositories;
 using CovidDataExtractor.Services;
 using Microsoft.Extensions.Hosting;
@@ -38,13 +39,16 @@ namespace CovidDataExtractor
             while (!stoppingToken.IsCancellationRequested)
             {
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                List<Data> dataList = new List<Data>();
                List<string> list = await webService.ParseHtml(@"http://www.bccdc.ca/health-info/diseases-conditions/covid-19/data");
                 list.ForEach(async x =>
                 {
-                    ParsedBitmap data = await webService.DownloadImage(x);
-                    ProcessedBitmap processed = ocrService.Extract(data, CropLocation.Chilliwack);
-                    webService.ParseDatesFromUrl(processed);
+                    ParsedBitmap parsed = await webService.DownloadImage(x);
+                    ProcessedBitmap processed = ocrService.Extract(parsed, CropLocation.Chilliwack);
+                    DateRange dates = webService.ParseDatesFromUrl(processed);
+                    dataList.Add(Data.Convert(processed, dates));
                 });
+                dataList.ForEach(async x => await  repo.Add(x));
 
                 await Task.Delay(1000, stoppingToken);
 

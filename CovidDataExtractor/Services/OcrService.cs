@@ -56,8 +56,8 @@ namespace CovidDataExtractor.Services
                 .Image;
 
             processedBitmap.Image = processed;
-            processedBitmap.ProcessedHtml = ReadBitmap(processed);
-            if (String.IsNullOrEmpty(processedBitmap.ProcessedHtml) || String.IsNullOrWhiteSpace(processedBitmap.ProcessedHtml))
+            processedBitmap.Count = ReadBitmap(processed);
+            if (processedBitmap.Count == -1)
             {
                 clone = new Bitmap(image.Image);
                 processed = processor
@@ -69,16 +69,20 @@ namespace CovidDataExtractor.Services
                     .Binarization(BinarizationThreshold.Heavy)
                     .Image;
                 processedBitmap.Image = processed;
-                processedBitmap.ProcessedHtml = ReadBitmap(processed);
+                processedBitmap.Count = ReadBitmap(processed);
             }
             return processedBitmap;
         }
-        private string ReadBitmap(Bitmap image)
+        private int ReadBitmap(Bitmap image)
         {
             ImageConverter converter = new ImageConverter();
             byte[] newimage = (byte[])converter.ConvertTo(image, typeof(byte[]));
             using var page = engine.Process(Pix.LoadFromMemory(newimage));
-            return page.GetText();
+            string convert = page.GetText();
+
+            if (String.IsNullOrEmpty(convert) || String.IsNullOrWhiteSpace(convert))
+                return -1;
+            return Convert.ToInt32(convert);
         }
 
         private static void SaveToFile(Bitmap image)

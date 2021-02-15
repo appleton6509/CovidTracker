@@ -9,6 +9,7 @@ namespace CovidDataExtractor.DTO
     {
         public CropLocation Location { get; set; }
         public string ProcessedHtml { get; set; }
+        public int Count { get; set; }
         public ProcessedBitmap(ParsedBitmap parsed)
         {
             this.Url = parsed.Url;
