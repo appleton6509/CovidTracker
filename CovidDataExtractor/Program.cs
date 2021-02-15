@@ -36,14 +36,11 @@ namespace CovidDataExtractor
                         else
                             x.UseSqlServer(hostContext.Configuration.GetSection("ConnectionStrings")["Database"]);
                     });
-
-
                     services.AddHttpClient();
                     services.AddTransient<IRepository, Repository>();
                     services.AddSingleton<IWebScrapingService, WebScrapingService>();
                     services.AddSingleton<IOcrService, OcrService>();
                     services.AddSingleton<IImagePreprocessor, ImagePreprocessor>();
-
                 });
     }
 }
