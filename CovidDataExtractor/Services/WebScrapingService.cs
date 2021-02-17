@@ -1,5 +1,6 @@
 ﻿using CovidDataExtractor.DTO;
 using HtmlAgilityPack;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -16,9 +17,11 @@ namespace CovidDataExtractor.Services
     public class WebScrapingService : IWebScrapingService
     {
         private HttpClient client;
-        public WebScrapingService(HttpClient client)
+        private ILogger<WebScrapingService> log;
+        public WebScrapingService(HttpClient client, ILogger<WebScrapingService> log)
         {
             this.client = client;
+            this.log = log;
         }
         public async Task<ParsedBitmap> DownloadImage(string url)
         {
@@ -72,7 +75,9 @@ namespace CovidDataExtractor.Services
                     dates.FromDate = DateTime.ParseExact(from, bcDateFormat, provider);
                     dates.ToDate = DateTime.ParseExact(to, bcDateFormat, provider);
                 }
-                catch { }
+                catch (Exception e) {
+                    log.LogWarning("Parse Dates Failed: " + e.Message);
+                }
             }
             return dates;
         }

@@ -16,7 +16,7 @@ namespace CovidDataExtractor
 {
     public class Worker : BackgroundService
     {
-        private readonly ILogger<Worker> _logger;
+        private readonly ILogger<Worker> log;
         private readonly IWebScrapingService webService;
         private readonly IOcrService ocrService;
         private readonly IRepository repo;
@@ -27,7 +27,7 @@ namespace CovidDataExtractor
             IRepository repo
             )
         {
-            _logger = logger;
+            log = logger;
             this.webService = service;
             this.ocrService = ocrService;
             this.repo = repo;
@@ -35,10 +35,10 @@ namespace CovidDataExtractor
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-
+            log.LogInformation("Worker started at: {time}", DateTimeOffset.Now);
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                log.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
                 List<Data> dataList = new List<Data>();
                List<string> list = await webService.ParseHtml(@"http://www.bccdc.ca/health-info/diseases-conditions/covid-19/data");
                 list.ForEach(async x =>
@@ -48,10 +48,18 @@ namespace CovidDataExtractor
                     DateRange dates = webService.ParseDatesFromUrl(processed);
                     dataList.Add(Data.Convert(processed, dates));
                 });
-                dataList.ForEach(async x => await  repo.Add(x));
 
-                await Task.Delay(60000, stoppingToken);
-
+                    dataList.ForEach(async x => {
+                        try
+                        {
+                            await repo.Add(x);
+                        }
+                        catch (Exception e)
+                        {
+                            log.LogError($"Cannot add data from date: {x.ToDate} due to database error: " + e.Message);
+                        }
+                    });
+                await Task.Delay(60000, stoppingToken);// 60 seconds
             }
         }
 

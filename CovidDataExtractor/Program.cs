@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Http;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +35,7 @@ namespace CovidDataExtractor
                     services.AddSingleton<IWebScrapingService, WebScrapingService>();
                     services.AddSingleton<IOcrService, OcrService>();
                     services.AddSingleton<IImagePreprocessor, ImagePreprocessor>();
+                    Console.WriteLine(("Connected to Database: " + hostContext.Configuration.GetSection("ConnectionStrings")["DisplayName"]));
                 });
     }
 }

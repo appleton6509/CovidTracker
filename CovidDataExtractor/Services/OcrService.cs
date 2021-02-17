@@ -1,11 +1,8 @@
 ﻿using CovidDataExtractor.DTO;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using Tesseract;
 
 namespace CovidDataExtractor.Services
@@ -55,6 +52,7 @@ namespace CovidDataExtractor.Services
                 .Binarization()
                 .Image;
 
+
             processedBitmap.Image = processed;
             processedBitmap.Count = ReadBitmap(processed);
             if (processedBitmap.Count == -1)
@@ -75,6 +73,7 @@ namespace CovidDataExtractor.Services
         }
         private int ReadBitmap(Bitmap image)
         {
+
             ImageConverter converter = new ImageConverter();
             byte[] newimage = (byte[])converter.ConvertTo(image, typeof(byte[]));
             using var page = engine.Process(Pix.LoadFromMemory(newimage));
