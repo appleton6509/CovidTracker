@@ -5,4 +5,4 @@ services:
     image: ${DOCKER_REGISTRY-}coviddataextractor
     build:
       context: .
-      dockerfile: CovidDataExtractor/Dockerfile
+      dockerfile: CovidDataExtractor\Dockerfile
