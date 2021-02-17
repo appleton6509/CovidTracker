@@ -25,16 +25,9 @@ namespace CovidDataExtractor
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddHostedService<Worker>();
-                    var DevSettings = new ConfigurationBuilder()
-                                                     .SetBasePath(hostContext.HostingEnvironment.ContentRootPath)
-                                                     .AddJsonFile("appsettings.Development.json")
-                                                     .Build();
                     services.AddDbContextFactory<CovidContext>((x) =>
                     {
-                        if (hostContext.HostingEnvironment.IsDevelopment())
-                            x.UseSqlServer(DevSettings.GetSection("ConnectionStrings")["Database"]);
-                        else
-                            x.UseSqlServer(hostContext.Configuration.GetSection("ConnectionStrings")["Database"]);
+                            x.UseNpgsql(hostContext.Configuration.GetSection("ConnectionStrings")["Database"]);
                     });
                     services.AddHttpClient();
                     services.AddTransient<IRepository, Repository>();

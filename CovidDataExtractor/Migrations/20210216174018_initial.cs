@@ -11,10 +11,11 @@ namespace CovidDataExtractor.Migrations
                 name: "Data",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FromDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ToDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Count = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    FromDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    ToDate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    Count = table.Column<int>(type: "integer", nullable: false),
+                    Image = table.Column<byte[]>(type: "bytea", nullable: true)
                 },
                 constraints: table =>
                 {
