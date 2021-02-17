@@ -32,9 +32,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="DLL\Tesseract.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="pic2.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -101,5 +98,9 @@
 
   <ItemGroup>
     <None Remove="C:\Users\apple\.nuget\packages\tesseract\4.1.1\build\\..\x64\tesseract41.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DLL\" />
   </ItemGroup>
 </Project>
