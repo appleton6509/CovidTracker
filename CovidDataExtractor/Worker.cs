@@ -39,17 +39,28 @@ namespace CovidDataExtractor
             while (!stoppingToken.IsCancellationRequested)
             {
                 log.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
-                List<Data> dataList = new List<Data>();
-               List<string> list = await webService.ParseHtml(@"http://www.bccdc.ca/health-info/diseases-conditions/covid-19/data");
-                list.ForEach(async x =>
+                List<Data> linksData = new List<Data>();
+               List<string> urls = await webService.ParseHtml(@"http://www.bccdc.ca/health-info/diseases-conditions/covid-19/data");
+                urls.ForEach(async x =>
                 {
-                    ParsedBitmap parsed = await webService.DownloadImage(x);
-                    ProcessedBitmap processed = ocrService.Extract(parsed, CropLocation.Chilliwack);
-                    DateRange dates = webService.ParseDatesFromUrl(processed);
-                    dataList.Add(Data.Convert(processed, dates));
+                    bool dateExists = true;
+                    DateRange dateRange = null;
+                    try
+                    {
+                        dateRange = webService.ParseDateRangeFromUrl(x, CropLocation.Chilliwack);
+                        dateExists = repo.Exists(dateRange.FromDate);
+                    } catch (Exception e)
+                    {
+                        log.LogError("Error accessing DB: " + e.Message);
+                    }
+                    if (!dateExists)
+                    {
+                        ParsedBitmap parsed = await webService.DownloadImage(x);
+                        ProcessedBitmap processed = ocrService.ExtractText(parsed, CropLocation.Chilliwack);
+                        linksData.Add(Data.Convert(processed, dateRange));
+                    }
                 });
-
-                    dataList.ForEach(async x => {
+                    linksData.ForEach(async x => {
                         try
                         {
                             await repo.Add(x);

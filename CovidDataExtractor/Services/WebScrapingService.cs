@@ -25,12 +25,16 @@ namespace CovidDataExtractor.Services
         }
         public async Task<ParsedBitmap> DownloadImage(string url)
         {
-            using var response = client.GetAsync(url);
-            Stream stream = await response.Result?.Content?.ReadAsStreamAsync();
-            if (stream is null)
-                return null;
-            Bitmap bmp = new Bitmap(stream);
-
+            Bitmap bmp = null;
+            try
+            {
+                using var response = client.GetAsync(url);
+                Stream stream = await response.Result?.Content?.ReadAsStreamAsync();
+                 bmp = new Bitmap(stream);
+            } catch (Exception e)
+            {
+                log.LogError("Unable to download image: " + e.Message);
+            }
             return new ParsedBitmap()
             {
                 Url = url,
@@ -39,48 +43,63 @@ namespace CovidDataExtractor.Services
         }
         public async Task<List<string>> ParseHtml(string url)
         {
+            List<string> list = new List<string>();
             string imageUrlStart = @"Health-Info-Site/PublishingImages/health-info/diseases-conditions/covid-19/case-counts-press-statements/covid19_lha_";
             HtmlDocument html = new HtmlDocument();
-            string data = await CallUrl(url);
-            html.LoadHtml(data);
-            var urlList = html
-                .DocumentNode
-                .Descendants("a")
-                .Where(x => x.GetAttributeValue("href", "").Contains(imageUrlStart))
-                .ToList();
-            List<string> list = new List<string>();
-            foreach (var item in urlList)
+            try
             {
-                string link = item
-                    .GetAttributeValue("href", "")
-                    .Replace("&#58;", ":");
-                link = link.StartsWith("/Health-Info-Site") ? link.Insert(0, "http://www.bccdc.ca") : link;
-                if (!link.Contains("cumulative"))
-                    list.Add(link);
+                string data = await CallUrl(url);
+                html.LoadHtml(data);
+                var urlList = html
+                    .DocumentNode
+                    .Descendants("a")
+                    .Where(x => x.GetAttributeValue("href", "").Contains(imageUrlStart))
+                    .ToList();
+
+                foreach (var item in urlList)
+                {
+                    string link = item
+                        .GetAttributeValue("href", "")
+                        .Replace("&#58;", ":");
+                    link = link.StartsWith("/Health-Info-Site") ? link.Insert(0, "http://www.bccdc.ca") : link;
+                    if (!link.Contains("cumulative"))
+                        list.Add(link);
+                }
+            } catch (Exception e)
+            {
+                log.LogError("Error parsing html: " + e.Message);
             }
+
             return list;
         }
-        public DateRange ParseDatesFromUrl(ProcessedBitmap processed)
+        public DateRange ParseDateRangeFromUrl(ProcessedBitmap processed)
         {
-            DateRange dates = new DateRange();
-            if (processed.Location == CropLocation.Chilliwack)
+            return ParseDateRangeFromUrl(processed.Url, processed.Location);
+        }
+        public DateRange ParseDateRangeFromUrl(string url, CropLocation local)
+        {
+            DateRange dateRange = new DateRange();
+            if (local == CropLocation.Chilliwack)
             {
                 string bcDateFormat = "yyyyMMdd";
                 try
                 {
                     CultureInfo provider = new CultureInfo("en-CA");
-                    int firstIndex = processed.Url.IndexOf("lha_");
-                    string from = processed.Url.Substring(firstIndex + 4, 8);
-                    string to = processed.Url.Substring(firstIndex + 13, 8);
-                    dates.FromDate = DateTime.ParseExact(from, bcDateFormat, provider);
-                    dates.ToDate = DateTime.ParseExact(to, bcDateFormat, provider);
+                    int firstIndex = url.IndexOf("lha_");
+                    string from = url.Substring(firstIndex + 4, 8);
+                    string to = url.Substring(firstIndex + 13, 8);
+                    dateRange.FromDate = DateTime.ParseExact(from, bcDateFormat, provider);
+                    dateRange.ToDate = DateTime.ParseExact(to, bcDateFormat, provider);
                 }
-                catch (Exception e) {
-                    log.LogWarning("Parse Dates Failed: " + e.Message);
+                catch (Exception e)
+                {
+                    log.LogWarning("Parse Date Failed: " + e.Message);
+                    dateRange = null;
                 }
             }
-            return dates;
+            return dateRange;
         }
+
         private async Task<string> CallUrl(string url)
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls13;

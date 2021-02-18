@@ -9,6 +9,7 @@ namespace CovidDataExtractor.Services
     {
         Task<ParsedBitmap> DownloadImage(string url);
         Task<List<string>> ParseHtml(string url);
-         DateRange ParseDatesFromUrl(ProcessedBitmap processed);
+         DateRange ParseDateRangeFromUrl(ProcessedBitmap processed);
+         DateRange ParseDateRangeFromUrl(string url, CropLocation local);
     }
 }

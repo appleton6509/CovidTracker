@@ -5,6 +5,6 @@ namespace CovidDataExtractor.Services
 {
     public interface IOcrService
     {
-        ProcessedBitmap Extract(ParsedBitmap image, CropLocation location);
+        ProcessedBitmap ExtractText(ParsedBitmap image, CropLocation location);
     }
 }

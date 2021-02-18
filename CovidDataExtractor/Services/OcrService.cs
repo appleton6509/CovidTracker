@@ -35,7 +35,7 @@ namespace CovidDataExtractor.Services
             engine.SetVariable("load_freq_dawg", false); // disable dictionary values
             engine.DefaultPageSegMode = PageSegMode.SingleWord;
         }
-        public ProcessedBitmap Extract(ParsedBitmap image, CropLocation location)
+        public ProcessedBitmap ExtractText(ParsedBitmap image, CropLocation location)
         {
             ProcessedBitmap processedBitmap = new ProcessedBitmap(image)
             {

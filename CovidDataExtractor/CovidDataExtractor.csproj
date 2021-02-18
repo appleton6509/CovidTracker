@@ -1,11 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk.Worker">
-
+﻿<Project Sdk="Microsoft.NET.Sdk.Worker;Microsoft.NET.Sdk.Publish">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>dotnet-CovidDataExtractor-639B91B4-90E6-4A16-92AF-2E6526AC12ED</UserSecretsId>
     <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
   </PropertyGroup>
-
+  <ItemGroup>
+    <Compile Remove="DLL\**" />
+    <Content Remove="DLL\**" />
+    <EmbeddedResource Remove="DLL\**" />
+    <None Remove="DLL\**" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.11.30" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.3" />
@@ -24,40 +28,37 @@
     <PackageReference Include="System.Drawing.Common" Version="5.0.1" />
     <PackageReference Include="Tesseract" Version="4.1.1" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="Tesseract">
       <HintPath>Tesseract.dll</HintPath>
     </Reference>
   </ItemGroup>
-
   <ItemGroup>
     <None Update="pic2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Settings.job">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="tessdata\eng.traineddata">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <None Update="C:\Users\apple\.nuget\packages\tesseract\4.1.1\build\\..\x64\leptonica-1.80.0.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <None Update="C:\Users\apple\.nuget\packages\tesseract\4.1.1\build\\..\x64\tesseract41.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <None Update="C:\Users\apple\.nuget\packages\tesseract\4.1.1\build\\..\x86\leptonica-1.80.0.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <None Update="C:\Users\apple\.nuget\packages\tesseract\4.1.1\build\\..\x86\tesseract41.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -75,32 +76,22 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <None Remove="C:\Users\apple\.nuget\packages\tesseract\4.1.1\build\\..\x64\leptonica-1.80.0.dll" />
   </ItemGroup>
-
   <ItemGroup>
     <None Remove="C:\Users\apple\.nuget\packages\tesseract\4.1.1\build\\..\x64\tesseract41.dll" />
   </ItemGroup>
-
   <ItemGroup>
     <None Remove="C:\Users\apple\.nuget\packages\tesseract\4.1.1\build\\..\x86\leptonica-1.80.0.dll" />
   </ItemGroup>
-
   <ItemGroup>
     <None Remove="C:\Users\apple\.nuget\packages\tesseract\4.1.1\build\\..\x86\tesseract41.dll" />
   </ItemGroup>
-
   <ItemGroup>
     <None Remove="C:\Users\apple\.nuget\packages\tesseract\4.1.1\build\\..\x64\leptonica-1.80.0.dll" />
   </ItemGroup>
-
   <ItemGroup>
     <None Remove="C:\Users\apple\.nuget\packages\tesseract\4.1.1\build\\..\x64\tesseract41.dll" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="DLL\" />
   </ItemGroup>
 </Project>

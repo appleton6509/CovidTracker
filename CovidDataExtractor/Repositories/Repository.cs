@@ -26,10 +26,10 @@ namespace CovidDataExtractor.Repositories
             await context.SaveChangesAsync();
             return;
         }
-        public bool Exists(DateTime fromdate)
+        public bool Exists(DateTime fromDate)
         {
             using var context = factory.CreateDbContext();
-            IQueryable<Data> found = context.Data.Where(x => x.FromDate.Equals(fromdate));
+            IQueryable<Data> found = context.Data.Where(x => x.FromDate.Equals(fromDate));
             return found.Count() > 0;
         }
 
