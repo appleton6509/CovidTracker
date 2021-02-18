@@ -1,8 +1,0 @@
-version: '3.4'
-
-services:
-  coviddataextractor:
-    image: ${DOCKER_REGISTRY-}coviddataextractor
-    build:
-      context: .
-      dockerfile: CovidDataExtractor\Dockerfile
