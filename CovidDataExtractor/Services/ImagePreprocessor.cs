@@ -88,6 +88,11 @@ namespace CovidDataExtractor.Services
             Image = new Bitmap(Image, new Size(350, 280));
             return this;
         }
+        /// <summary>
+        /// Turns a bitmap black and white
+        /// </summary>
+        /// <param name="thresh"></param>
+        /// <returns></returns>
         public ImagePreprocessor Binarization(BinarizationThreshold thresh = BinarizationThreshold.Light)
         {
             try
