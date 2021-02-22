@@ -76,10 +76,10 @@ namespace CovidDataExtractor.Services
         {
             return ParseDateRangeFromUrl(processed.Url, processed.Location);
         }
-        public DateRange ParseDateRangeFromUrl(string url, CropLocation local)
+        public DateRange ParseDateRangeFromUrl(string url, Location local)
         {
             DateRange dateRange = new DateRange();
-            if (local == CropLocation.Chilliwack)
+            if (local == Location.Chilliwack)
             {
                 string bcDateFormat = "yyyyMMdd";
                 try

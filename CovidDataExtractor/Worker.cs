@@ -20,7 +20,10 @@ namespace CovidDataExtractor
         private readonly IWebScrapingService webService;
         private readonly IOcrService ocrService;
         private readonly IRepository repo;
-
+        private static readonly Dictionary<Location, Rectangle> map = new Dictionary<Location, Rectangle>()
+        {
+              {Location.Chilliwack, new Rectangle(2290, 2098, 70,35) }
+        };
         public Worker(ILogger<Worker> logger, 
             IWebScrapingService service, 
             IOcrService ocrService,
@@ -47,7 +50,7 @@ namespace CovidDataExtractor
                     DateRange dateRange = null;
                     try
                     {
-                        dateRange = webService.ParseDateRangeFromUrl(x, CropLocation.Chilliwack);
+                        dateRange = webService.ParseDateRangeFromUrl(x, Location.Chilliwack);
                         dateExists = repo.Exists(dateRange.FromDate);
                     } catch (Exception e)
                     {
@@ -56,7 +59,7 @@ namespace CovidDataExtractor
                     if (!dateExists)
                     {
                         ParsedBitmap parsed = await webService.DownloadImage(x);
-                        ProcessedBitmap processed = ocrService.ExtractText(parsed, CropLocation.Chilliwack);
+                        ProcessedBitmap processed = ocrService.GetNumberFromProcessedImage(parsed, Location.Chilliwack, map[Location.Chilliwack]);
                         linksData.Add(Data.Convert(processed, dateRange));
                     }
                 });

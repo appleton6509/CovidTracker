@@ -25,7 +25,7 @@ namespace CovidDataExtractor.Entity
                 Image = bytes,
                  FromDate = dates.FromDate,
                  ToDate = dates.ToDate,
-                 Count = bitmap.Count
+                 Count = bitmap.NumberReadFromImage
             };
         }
     }

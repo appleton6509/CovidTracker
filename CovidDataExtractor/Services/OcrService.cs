@@ -7,7 +7,7 @@ using Tesseract;
 
 namespace CovidDataExtractor.Services
 {
-    public enum CropLocation
+    public enum Location
     {
         Chilliwack
     }
@@ -15,16 +15,13 @@ namespace CovidDataExtractor.Services
     {
         private static int counter = 0;
         private readonly TesseractEngine engine;
-        private IImagePreprocessor processor;
-        private static readonly Dictionary<CropLocation, Rectangle> map = new Dictionary<CropLocation, Rectangle>()
-        {
-              {CropLocation.Chilliwack, new Rectangle(2290, 2098, 70,35) }
-        };
+        private IImagePreprocessor imageProcessor;
+
 
         public OcrService(IImagePreprocessor processor)
         {
             this.engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default);
-            this.processor = processor;
+            this.imageProcessor = processor;
             DefaultSettings();
         }
 
@@ -35,52 +32,36 @@ namespace CovidDataExtractor.Services
             engine.SetVariable("load_freq_dawg", false); // disable dictionary values
             engine.DefaultPageSegMode = PageSegMode.SingleWord;
         }
-        public ProcessedBitmap ExtractText(ParsedBitmap image, CropLocation location)
+        public ProcessedBitmap GetNumberFromProcessedImage(ParsedBitmap image, Location location, Rectangle cropLocation)
         {
-            ProcessedBitmap processedBitmap = new ProcessedBitmap(image)
+            ProcessedBitmap processed = new ProcessedBitmap(imageProcessor);
+            processed = processed.Process(image, location, cropLocation);
+            try
             {
-                Location = location
-            };
-            Bitmap clone = new Bitmap(image.Image);
-
-            Bitmap processed = processor
-                .SetImage(clone)
-                .Crop(map[location])
-                .FloodFill()
-                .Resize()
-                .AddBorder(Color.White)
-                .Binarization()
-                .Image;
-
-
-            processedBitmap.Image = processed;
-            processedBitmap.Count = ReadBitmap(processed);
-            if (processedBitmap.Count == -1)
-            {
-                clone = new Bitmap(image.Image);
-                processed = processor
-                    .SetImage(clone)
-                    .Crop(map[location])
-                    .FloodFill()
-                    .Resize()
-                    .AddBorder(Color.White)
-                    .Binarization(BinarizationThreshold.Heavy)
-                    .Image;
-                processedBitmap.Image = processed;
-                processedBitmap.Count = ReadBitmap(processed);
+                processed.NumberReadFromImage = ReadImageText(processed.Image);
             }
-            return processedBitmap;
+            catch (NotSupportedException e) {
+                processed = processed.Process(image, location, cropLocation,BinarizationThreshold.Heavy);
+                processed.NumberReadFromImage = ReadImageText(processed.Image);
+            }
+            return processed; ;
         }
-        private int ReadBitmap(Bitmap image)
-        {
 
+        /// <summary>
+        /// read a bitmap image for a number
+        /// </summary>
+        /// <param name="image">image to read</param>
+        /// <returns>number read from the bitmap</returns>
+        /// <exception cref="NotSupportedException">No number could be read from image</exception>
+        private int ReadImageText(Bitmap image)
+        {
             ImageConverter converter = new ImageConverter();
             byte[] newimage = (byte[])converter.ConvertTo(image, typeof(byte[]));
             using var page = engine.Process(Pix.LoadFromMemory(newimage));
             string convert = page.GetText();
 
             if (String.IsNullOrEmpty(convert) || String.IsNullOrWhiteSpace(convert))
-                return -1;
+                throw new NotSupportedException();
             return Convert.ToInt32(convert);
         }
 

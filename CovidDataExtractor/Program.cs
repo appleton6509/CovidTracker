@@ -28,7 +28,7 @@ namespace CovidDataExtractor
                     services.AddHostedService<Worker>();
                     services.AddDbContextFactory<CovidContext>((x) =>
                     {
-                            x.UseNpgsql(hostContext.Configuration.GetSection("ConnectionStrings")["Database"]);
+                        x.UseNpgsql(hostContext.Configuration.GetSection("ConnectionStrings")["Database"]);
                     });
                     services.AddHttpClient();
                     services.AddTransient<IRepository, Repository>();
