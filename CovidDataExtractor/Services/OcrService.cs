@@ -40,7 +40,7 @@ namespace CovidDataExtractor.Services
             {
                 processed.NumberReadFromImage = ReadImageText(processed.Image);
             }
-            catch (NotSupportedException e) {
+            catch (NotSupportedException) {
                 processed = processed.Process(image, location, cropLocation,BinarizationThreshold.Heavy);
                 processed.NumberReadFromImage = ReadImageText(processed.Image);
             }

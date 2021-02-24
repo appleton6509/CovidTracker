@@ -32,24 +32,33 @@ namespace CovidDataExtractor.Services
         {
             try
             {
-                const int borderSize = 20;
-                int newWidth = Image.Width + (borderSize * 2);
-                int newHeight = Image.Height + (borderSize * 2);
-                Image newImage = new Bitmap(newWidth, newHeight);
-                using (Brush border = new SolidBrush(color))
-                {
-                    Graphics g = Graphics.FromImage(newImage);
-                    g.FillRectangle(border, new Rectangle(0, 0, newWidth, newHeight));
-                    g.DrawImage(Image, new Rectangle(borderSize, borderSize, Image.Width, Image.Height));
-                }
+                Image newImage = DrawBorder(color);
                 Image = (Bitmap)newImage;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 log.LogWarning("AddBorder failed: " + e.Message);
             }
 
             return this;
         }
+
+        private Image DrawBorder(Color color)
+        {
+            const int borderSize = 20;
+            int newWidth = Image.Width + (borderSize * 2);
+            int newHeight = Image.Height + (borderSize * 2);
+            Image newImage = new Bitmap(newWidth, newHeight);
+            using (Brush border = new SolidBrush(color))
+            {
+                Graphics g = Graphics.FromImage(newImage);
+                g.FillRectangle(border, new Rectangle(0, 0, newWidth, newHeight));
+                g.DrawImage(Image, new Rectangle(borderSize, borderSize, Image.Width, Image.Height));
+            }
+
+            return newImage;
+        }
+
         /// <summary>
         /// Fills all occurances of a specified color to black
         /// </summary>

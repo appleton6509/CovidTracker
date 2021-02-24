@@ -18,10 +18,10 @@ namespace CovidDataExtractor.Repositories
 
         public async Task Add(Data data)
         {
-            using var context = factory.CreateDbContext();
             if (Exists(data.FromDate))
                 return;
 
+            using var context = factory.CreateDbContext();
             context.Data.Add(data);
             await context.SaveChangesAsync();
             return;

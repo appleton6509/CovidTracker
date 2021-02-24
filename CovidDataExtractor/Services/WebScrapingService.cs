@@ -44,11 +44,9 @@ namespace CovidDataExtractor.Services
         public async Task<List<string>> ParseHtml(string url)
         {
             List<string> list = new List<string>();
-            string imageUrlStart = @"Health-Info-Site/PublishingImages/health-info/diseases-conditions/covid-19/case-counts-press-statements/covid19_lha_";
-
             try
             {
-                List<HtmlNode> urlList = await ScrapeHtmlForUrl(url, imageUrlStart);
+                List<HtmlNode> urlList = await ScrapeHtmlForUrl(url);
                 list = ConvertHtmlUrlToList(urlList);
             }
             catch (Exception e)
@@ -74,8 +72,9 @@ namespace CovidDataExtractor.Services
             return list;
         }
 
-        private async Task<List<HtmlNode>> ScrapeHtmlForUrl(string url, string imageUrlStart)
+        private async Task<List<HtmlNode>> ScrapeHtmlForUrl(string url)
         {
+            string imageUrlStart = @"Health-Info-Site/PublishingImages/health-info/diseases-conditions/covid-19/case-counts-press-statements/covid19_lha_";
             HtmlDocument html = new HtmlDocument();
             string data = await CallUrl(url);
             html.LoadHtml(data);
